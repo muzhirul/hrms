@@ -195,7 +195,6 @@ class BankDelete(generics.UpdateAPIView):
         return CustomResponse(code=status.HTTP_200_OK, message=f"Bank {instance.name} Delete successfully", data=None)
 
 
-
 '''
 For Holiday
 '''

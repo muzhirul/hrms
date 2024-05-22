@@ -23,5 +23,6 @@ admin.site.site_header = 'Human Resource'
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('auth/', include('authentication.urls')),
+    path('staff/',include('staff.urls')),
     path('setup/',include('setup_app.urls')),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

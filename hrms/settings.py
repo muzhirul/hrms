@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'institution',
     'setup_app',
     'hrms_setup',
+    'staff',
 ]
 
 MIDDLEWARE = [

@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_userforeignkey',
     'authentication',
-    'institution'
+    'institution',
+    'setup_app',
 ]
 
 MIDDLEWARE = [

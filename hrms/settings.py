@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'authentication',
     'institution',
     'setup_app',
+    'hrms_setup',
 ]
 
 MIDDLEWARE = [

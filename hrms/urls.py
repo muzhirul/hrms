@@ -24,5 +24,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('auth/', include('authentication.urls')),
     path('staff/',include('staff.urls')),
+    path('hrms/',include('hrms_setup.urls')),
     path('setup/',include('setup_app.urls')),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -341,6 +341,12 @@ class AttendanceDailyRaw(models.Model):
     staff_code = models.CharField(max_length=20, blank=True,null=True)
     attn_date = models.DateField(verbose_name='Attendance Date',blank=True,null=True)
     trnsc_time = models.DateTimeField(blank=True, null=True)
+    device_ip = models.GenericIPAddressField(blank=True,null=True)
+    device_name = models.CharField(max_length=255,blank=True,null=True)
+    device_serial = models.CharField(max_length=255, blank=True,null=True)
+    email = models.EmailField(blank=True,null=True)
+    mobile = models.CharField(max_length=255,blank=True,null=True)
+    username = models.CharField(max_length=255,blank=True,null=True)
     src_type = models.CharField(max_length=20,blank=True,null=True)
     attn_type = models.CharField(max_length=20,blank=True,null=True)
     remarks = models.CharField(max_length=500, blank=True,null=True)
@@ -357,7 +363,7 @@ class AttendanceDailyRaw(models.Model):
         db_table = 'raw_attn_daily'
 
     def __str__(self):
-        return str(self.id)
+        return str(self.staff_code)
 
 def leave_code():
     last_leave_code = StaffLeaveTransaction.objects.all().order_by('code').last()

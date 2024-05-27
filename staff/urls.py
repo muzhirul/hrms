@@ -46,4 +46,6 @@ urlpatterns = [
     path('api/leave-trns/<str:staff_id>', StaffLeaveTrnslLst.as_view(), name='staff-leave-transaction-list'),
     # Staff Leave Type base on assign 
     path('api/leave-type/list', StaffLeaveTypeList.as_view(), name='staff-leave-type-list'),
+    # Retrive Data From Puntch 
+    path('api/punch/data', StaffPunchData.as_view(), name='punch-data-retrive'),
 ]

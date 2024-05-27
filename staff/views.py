@@ -15,6 +15,7 @@ from django.db.models.functions import Coalesce
 from django.db.models import F
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
+import requests
 # Create your views here.
 
 class StaffDepartmentList(generics.ListAPIView):
@@ -1861,3 +1862,44 @@ class StaffLeaveTypeList(generics.ListAPIView):
 
         return Response(response_data)
 
+class StaffPunchData(generics.ListAPIView):
+    def list(self, request, *args, **kwargs):
+        url = f"http://192.168.117.152:5002/waltonagro/attn_data"
+        attn_date = self.request.query_params.get('attn_date')
+        if attn_date:
+            pass
+        else:
+            attn_date = datetime.now().date()
+        payload = ""
+        headers = {}
+        response = requests.request("GET",url,headers=headers,data=payload)
+        json_data = response.json()
+        attn_data = json_data['attendance_data']
+        punch_data = {}
+        for i in attn_data:
+            if attn_date == datetime.strptime(i['punch_time'], '%Y-%m-%d %H:%M:%S').date():
+                attn_count = AttendanceDailyRaw.objects.filter(staff_code=i['user_id'],trnsc_time=datetime.strptime(i['punch_time'], '%Y-%m-%d %H:%M:%S')).count()
+                if attn_count == 0:
+                    punch_data['device_ip'] = i['device_ip']
+                    punch_data['attn_date'] = datetime.strptime(i['punch_time'], '%Y-%m-%d %H:%M:%S').date()
+                    punch_data['trnsc_time'] = datetime.strptime(i['punch_time'], '%Y-%m-%d %H:%M:%S')
+                    punch_data['device_name'] = i['device_name']
+                    punch_data['device_serial'] = i['device_serial']
+                    punch_data['email'] = i['email']
+                    punch_data['mobile'] = i['mobile']
+                    punch_data['staff_code'] = i['user_id']
+                    punch_data['src_type'] = 'device'
+                    try:
+                        staff_info = Staff.objects.get(staff_id=i['user_id'],status=True)
+                        punch_data['staff'] = staff_info
+                        punch_data['institution'] = staff_info.institution
+                        punch_data['branch'] = staff_info.branch
+                    except:
+                        punch_data['staff'] = None
+                        punch_data['institution'] = None
+                        punch_data['branch'] = None
+                    punch_data['username'] = i['username']
+                    p = AttendanceDailyRaw.objects.create(**punch_data)
+                else:
+                    pass
+        return Response(punch_data)

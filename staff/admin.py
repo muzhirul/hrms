@@ -46,6 +46,7 @@ class StaffAdmin(admin.ModelAdmin):
     fieldsets = [
         ("Basic Information",{'fields':[('first_name','last_name','gender','religion'),('email','dob','mobile_no','emergency_number','nid'),('photo','photo_thumbnail','blood_group','marital_status'),]}),
         ("Address",{'fields':[('present_address','permanent_address'),]}),
+        ("Institution Information",{'fields':[('institution','branch'),]}),
         ("Assignment",{'fields':[('doj','role','department','designation','shift','status'),]})        
     ]
     
@@ -94,11 +95,20 @@ class StaffLeaveTransactionAdmin(admin.ModelAdmin):
     inlines = [StaffLeaveAppHistoryTabularInline]
 
 
+class AttendanceDailyRawAdmin(admin.ModelAdmin):
+    list_display = ['staff','staff_code','src_type','attn_date','trnsc_time','device_name','device_serial']
+    search_fields = ['staff_code','src_type','attn_date','device_name','device_serial']
+
+    class Meta:
+        model = AttendanceDailyRaw
+
+
 
 admin.site.register(Staff,StaffAdmin)
 admin.site.register(Designation,DesignationAdmin)
 admin.site.register(Department,DepartmentAdmin)
 admin.site.register(StaffShift,StaffShiftAdmin)
+admin.site.register(AttendanceDailyRaw,AttendanceDailyRawAdmin)
 admin.site.register(ProcessAttendanceDaily,ProcessAttendanceDailyAdmin)
 admin.site.register(StaffLeaveTransaction,StaffLeaveTransactionAdmin)
 admin.site.register(StaffLeaveAppHistory)

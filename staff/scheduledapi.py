@@ -3,4 +3,10 @@ from datetime import datetime
 from decouple import config
 
 def product_registration():
-    pass
+    # pass
+    # For insert attendance data for each employee
+    url = f"{config('BASE_URL')}/staff/api/attendance/process"
+    payload={}
+    headers = {}
+    response = requests.request("GET", url, headers=headers, data=payload)
+    print('Insert Attendance data process DONE')

@@ -30,7 +30,7 @@ class StaffLeaveTabulrInline(admin.TabularInline):
 
 class ProcessAttendanceDailyAdminTabularInline(admin.TabularInline):
     model = ProcessAttendanceDaily
-    fields = ['attn_date','shift','in_time','out_time','duration','attn_type','late_by_min','early_gone_by_min']
+    fields = ['attn_date','shift','in_time','out_time','duration','ot_duration','attn_type','late_by_min','early_gone_by_min']
     extra = 0
 
 class StaffLeaveTransactionAdminTabularInline(admin.TabularInline):
@@ -70,7 +70,7 @@ class DesignationAdmin(admin.ModelAdmin):
         model = Designation
         
 class StaffShiftAdmin(admin.ModelAdmin):
-    list_display = ['code','name','start_time','end_time','status']
+    list_display = ['code','name','start_time','end_time','duration','status']
     fields = ['name','start_time','end_time','remarks']
     class Meta:
         model = StaffShift

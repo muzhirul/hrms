@@ -5,7 +5,7 @@ from django_userforeignkey.models.fields import UserForeignKey
 from setup_app.models import *
 from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
-from datetime import datetime,date, time
+from datetime import datetime, date, time, timedelta
 from hrms_setup.models import AccountBank, LeaveType
 import datetime
 from authentication.models import Authentication
@@ -80,6 +80,7 @@ class StaffShift(models.Model):
     name = models.CharField(max_length=50,verbose_name='Shift Name')
     start_time = models.TimeField()
     end_time = models.TimeField()
+    duration = models.DurationField(blank=True,null=True, verbose_name='Duraion')
     start_buf_min = models.IntegerField(default=0)
     end_buf_min = models.IntegerField(default=0)
     start_date = models.DateField(blank=True, null=True)
@@ -98,6 +99,17 @@ class StaffShift(models.Model):
         
     def __str__(self):
         return str(self.name)
+    
+@receiver(pre_save, sender=StaffShift)        
+def cal_duration(sender, instance, **kwargs):
+    if instance.start_time and instance.end_time:
+        from datetime import datetime
+        datetime_start = datetime.combine(datetime.today(), instance.start_time)
+        datetime_end = datetime.combine(datetime.today(), instance.end_time)
+        duration = datetime_end - datetime_start
+        instance.duration = duration
+    else:
+        instance.duration = None
 
 class Staff(models.Model):
     code = models.CharField(max_length=20, blank=True, null=True,verbose_name='Staff Code')
@@ -279,6 +291,7 @@ class ProcessAttendanceDaily(models.Model):
     in_time = models.DateTimeField(blank=True,null=True)
     out_time = models.DateTimeField(blank=True,null=True)
     duration = models.DurationField(blank=True,null=True, verbose_name='Duraion')
+    ot_duration = models.DurationField(blank=True,null=True, verbose_name='OT Duraion')
     role = models.ForeignKey(Role, on_delete=models.SET_NULL, blank=True, null=True)
     designation = models.ForeignKey(Designation, on_delete=models.SET_NULL, blank=True, null=True)
     department = models.ForeignKey(Department, on_delete=models.SET_NULL, blank=True, null=True)
@@ -302,7 +315,8 @@ class ProcessAttendanceDaily(models.Model):
     def get_day_name(self):
         return self.attn_date.strftime('%A')
     
-    
+
+
 @receiver(pre_save, sender=ProcessAttendanceDaily)        
 def calculate_duration(sender, instance, **kwargs):
     if instance.in_time and instance.out_time:
@@ -310,6 +324,18 @@ def calculate_duration(sender, instance, **kwargs):
         instance.duration = duration
     else:
         instance.duration = None
+
+@receiver(pre_save, sender=ProcessAttendanceDaily)   
+def calculate_ot_duration(sender, instance, **kwargs):
+    if instance.in_time and instance.out_time and instance.shift.duration:
+        if instance.shift.duration < instance.duration:
+            print(instance.shift.duration,instance.duration)
+            ot_duration = instance.duration-instance.shift.duration
+            instance.ot_duration = ot_duration
+        else:
+            instance.ot_duration = None
+    else:
+        instance.ot_duration = None
 
 @receiver(pre_save, sender=ProcessAttendanceDaily)  
 def cal_late_min(sender,instance,**kwargs):

@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_userforeignkey',
     'corsheaders',
+    'django_apscheduler',
     'authentication',
     'institution',
     'setup_app',
@@ -61,6 +62,10 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'hrms.urls'
+
+APSCHEDULER_DATETIME_FORMAT = "N j, Y, f:s a"  # Default
+
+SCHEDULER_DEFAULT = True
 
 TEMPLATES = [
     {
@@ -121,13 +126,19 @@ TIME_ZONE = 'Asia/Dhaka'
 
 USE_I18N = True
 
-USE_TZ = False
+USE_TZ = True
 
+import os.path  
+import sys
+
+PROJECT_ROOT = os.path.normpath(os.path.dirname(__file__))
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
+STATICFILES_DIRS = [ os.path.join(BASE_DIR, 'hrms')]
+STATIC_ROOT =  os.path.join(BASE_DIR, 'static')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

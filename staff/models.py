@@ -105,6 +105,7 @@ def cal_duration(sender, instance, **kwargs):
     if instance.start_time and instance.end_time:
         from datetime import datetime
         datetime_start = datetime.combine(datetime.today(), instance.start_time)
+        print(datetime_start)
         datetime_end = datetime.combine(datetime.today(), instance.end_time)
         duration = datetime_end - datetime_start
         instance.duration = duration
@@ -292,6 +293,7 @@ class ProcessAttendanceDaily(models.Model):
     out_time = models.DateTimeField(blank=True,null=True)
     duration = models.DurationField(blank=True,null=True, verbose_name='Duraion')
     ot_duration = models.DurationField(blank=True,null=True, verbose_name='OT Duraion')
+    actual_ot_duration = models.DurationField(blank=True,null=True,verbose_name='actual_ot_duration')
     role = models.ForeignKey(Role, on_delete=models.SET_NULL, blank=True, null=True)
     designation = models.ForeignKey(Designation, on_delete=models.SET_NULL, blank=True, null=True)
     department = models.ForeignKey(Department, on_delete=models.SET_NULL, blank=True, null=True)
@@ -329,13 +331,30 @@ def calculate_duration(sender, instance, **kwargs):
 def calculate_ot_duration(sender, instance, **kwargs):
     if instance.in_time and instance.out_time and instance.shift.duration:
         if instance.shift.duration < instance.duration:
-            print(instance.shift.duration,instance.duration)
             ot_duration = instance.duration-instance.shift.duration
             instance.ot_duration = ot_duration
         else:
             instance.ot_duration = None
     else:
         instance.ot_duration = None
+
+@receiver(pre_save, sender=ProcessAttendanceDaily)   
+def cal_act_ot_duration(sender, instance, **kwargs):
+    if instance.in_time and instance.out_time and instance.shift.duration:
+        if instance.shift.duration < instance.duration:
+            from datetime import datetime
+            if instance.in_time.replace(tzinfo=None) > datetime.combine(instance.in_time.date(), instance.shift.start_time):
+                act_ot_duration = instance.out_time - instance.in_time
+                instance.actual_ot_duration = act_ot_duration
+            else:
+                datetime_end = datetime.combine(instance.out_time.date(), instance.shift.end_time)
+                print(instance.out_time.replace(tzinfo=None),datetime_end)
+                act_ot_duration = instance.out_time.replace(tzinfo=None)-datetime_end
+                instance.actual_ot_duration = act_ot_duration
+        else:
+            instance.actual_ot_duration = None
+    else:
+        instance.actual_ot_duration = None
 
 @receiver(pre_save, sender=ProcessAttendanceDaily)  
 def cal_late_min(sender,instance,**kwargs):

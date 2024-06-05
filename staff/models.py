@@ -341,16 +341,20 @@ def calculate_ot_duration(sender, instance, **kwargs):
 @receiver(pre_save, sender=ProcessAttendanceDaily)   
 def cal_act_ot_duration(sender, instance, **kwargs):
     if instance.in_time and instance.out_time and instance.shift.duration:
+        from pytz import timezone as pytz_timezone
+        db_timezone = pytz_timezone('Asia/Dhaka')
         if instance.shift.duration < instance.duration:
             from datetime import datetime
             if instance.in_time.replace(tzinfo=None) > datetime.combine(instance.in_time.date(), instance.shift.start_time):
                 act_ot_duration = instance.out_time - instance.in_time
                 instance.actual_ot_duration = act_ot_duration
+                print('0000000')
             else:
                 datetime_end = datetime.combine(instance.out_time.date(), instance.shift.end_time)
-                print(instance.out_time.replace(tzinfo=None),datetime_end)
+                print(instance.out_time,instance.out_time.replace(tzinfo=db_timezone),datetime_end)
                 act_ot_duration = instance.out_time.replace(tzinfo=None)-datetime_end
                 instance.actual_ot_duration = act_ot_duration
+                print('111111')
         else:
             instance.actual_ot_duration = None
     else:
@@ -520,6 +524,60 @@ class StaffLeaveAppHistory(models.Model):
 
     def __str__(self):
         return str(self.id)
+
+def staff_atnn_code():
+    last_staff_attn_code = ProcessStaffAttendanceMst.objects.all().order_by('code').last()
+    if not last_staff_attn_code or last_staff_attn_code.code is None:
+        return 'P-' + '1'
+    staff_attn_mst_num = str(last_staff_attn_code.code)[2:]
+    staff_attn_mst_num_int = int(staff_attn_mst_num)
+    new_staff_attn_mst_num = staff_attn_mst_num_int + 1
+    new_gd_num = 'P-' + str(new_staff_attn_mst_num)
+    return new_gd_num   
+
+class ProcessStaffAttendanceMst(models.Model):
+    code = models.CharField(max_length=15,verbose_name='Code',default=staff_atnn_code,editable=False)
+    staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
+    from_date = models.DateField()
+    to_date = models.DateField()
+    total_day = models.IntegerField(default=0,editable=False)
+    present_day = models.IntegerField(default=0)
+    absent_day = models.IntegerField(default=0)
+    late_day = models.IntegerField(default=0)
+    early_gone_day = models.IntegerField(default=0)
+    ot_hour = models.IntegerField(default=0)
+    gen_type = models.CharField(max_length=15, default='AUTO')
+    tour_day = models.IntegerField(default=0)
+    weekend_day = models.IntegerField(default=0)
+    holiday_day = models.IntegerField(default=0)
+    actual_gross = models.IntegerField(default=0)
+    calc_gross = models.IntegerField(default=0)
+    institution = models.ForeignKey(Institution,on_delete=models.SET_NULL,blank=True,null=True,verbose_name='Institution Name')
+    branch = models.ForeignKey(Branch,on_delete=models.SET_NULL,blank=True,null=True,verbose_name='Branch Name')
+    created_by = UserForeignKey(auto_user_add=True, on_delete=models.SET_NULL,related_name='staff_proc_atnn_mst_creator', editable=False, blank=True, null=True)
+    updated_by = UserForeignKey(auto_user=True, on_delete=models.SET_NULL, related_name='staff_proc_atnn_mst_update_by', editable=False, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'staff_proc_out_attn_mst'
+
+    def save(self, *args, **kwargs):
+        # Calculate the number of days between from_date and to_date
+        if self.from_date and self.to_date:
+            delta = self.to_date - self.from_date
+            self.total_day = delta.days + 1
+        else:
+            self.total_day = 0
+        
+        # Call the original save method
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return str(self.code)
+
+
+
 
 
 

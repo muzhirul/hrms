@@ -1072,11 +1072,15 @@ class StaffAttendanceProcess(generics.ListCreateAPIView):
         staff_lists = Staff.objects.filter(status=True).order_by('id')
         proc_attn_daily = {}
         row_insert = 0
-        day_name = attn_date.strftime('%A').lower()
-        if(day_name=='friday'):
-            att_type = AttendanceType.objects.get(name__iexact='weekend',status=True)
+        holiday_count = Holiday.objects.filter(status=True,is_active=True,type__name__iexact='holiday',start_date__lte=attn_date,end_date__gte=attn_date).count()
+        if holiday_count > 0:
+            att_type = AttendanceType.objects.get(name__iexact='holiday',status=True)
         else:
-            att_type = AttendanceType.objects.get(name__iexact='absent',status=True)
+            day_name = attn_date.strftime('%A').lower()
+            if(day_name=='friday'):
+                att_type = AttendanceType.objects.get(name__iexact='weekend',status=True)
+            else:
+                att_type = AttendanceType.objects.get(name__iexact='absent',status=True)
         attn_id = att_type
         for staff_list in staff_lists:
             data_count = ProcessAttendanceDaily.objects.filter(attn_date=attn_date,staff=staff_list,status=True).count()
@@ -1109,11 +1113,15 @@ class StaffAttendanceProcess(generics.ListCreateAPIView):
         data=request.data
         proc_date = data['proc_date']
         proc_date = datetime.strptime(proc_date, '%Y-%m-%d')
-        day_name = proc_date.strftime('%A').lower()
-        if(day_name=='friday'):
-            att_type = AttendanceType.objects.get(name__iexact='weekend',status=True)
+        holiday_count = Holiday.objects.filter(status=True,is_active=True,type__name__iexact='holiday',start_date__lte=proc_date,end_date__gte=proc_date).count()
+        if holiday_count > 0:
+            att_type = AttendanceType.objects.get(name__iexact='holiday',status=True)
         else:
-            att_type = AttendanceType.objects.get(name__iexact='absent',status=True)
+            day_name = proc_date.strftime('%A').lower()
+            if(day_name=='friday'):
+                att_type = AttendanceType.objects.get(name__iexact='weekend',status=True)
+            else:
+                att_type = AttendanceType.objects.get(name__iexact='absent',status=True)
         attn_id = att_type
         row_insert = 0
         if proc_date:

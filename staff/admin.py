@@ -102,6 +102,13 @@ class AttendanceDailyRawAdmin(admin.ModelAdmin):
     class Meta:
         model = AttendanceDailyRaw
 
+class ProcessStaffAttendanceMstAdmin(admin.ModelAdmin):
+    list_display = ['code','staff','from_date','to_date','total_day']
+    search_fields = ['code','from_date','to_date','total_day']
+
+    class Meta:
+        model = ProcessStaffAttendanceMst
+
 
 
 admin.site.register(Staff,StaffAdmin)
@@ -112,3 +119,4 @@ admin.site.register(AttendanceDailyRaw,AttendanceDailyRawAdmin)
 admin.site.register(ProcessAttendanceDaily,ProcessAttendanceDailyAdmin)
 admin.site.register(StaffLeaveTransaction,StaffLeaveTransactionAdmin)
 admin.site.register(StaffLeaveAppHistory)
+admin.site.register(ProcessStaffAttendanceMst,ProcessStaffAttendanceMstAdmin)

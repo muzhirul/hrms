@@ -48,4 +48,6 @@ urlpatterns = [
     path('api/leave-type/list', StaffLeaveTypeList.as_view(), name='staff-leave-type-list'),
     # Retrive Data From Puntch 
     path('api/punch/data', StaffPunchData.as_view(), name='punch-data-retrive'),
+    # Staff attendance master table Process
+    path('api/attendance-summery/process', StaffAttendanceSummeryProcess.as_view(), name='staff-attn-summery-process'),
 ]

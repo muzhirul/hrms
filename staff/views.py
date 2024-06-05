@@ -1562,7 +1562,6 @@ class staffLeaveTransactionList(generics.RetrieveAPIView):
         # Customize the response format for retrieving a single instance
         return CustomResponse(code=status.HTTP_200_OK, message="Success", data=StaffLeaveTransactionListSerializer(instance).data)
 
-
 class staffLeaveStatusList(generics.ListAPIView):
     serializer_class = StaffLeaveViewSerialier
     permission_classes = [permissions.IsAuthenticated]  # Requires a valid JWT token for access
@@ -1716,7 +1715,6 @@ class StaffLeaveTrnsPersonallLst(generics.ListAPIView):
             }
 
         return Response(response_data)
-
 
 class StaffLeaveTrnslLst(generics.ListAPIView):
     serializer_class = StaffLeaveTransactionViewSerializer
@@ -1911,3 +1909,26 @@ class StaffPunchData(generics.ListAPIView):
                 else:
                     pass
         return Response(punch_data)
+
+
+class StaffAttendanceSummeryProcess(generics.CreateAPIView):
+    serializer_class = ProcessStaffAttendanceMstCreateSerializer
+    permission_classes = [permissions.IsAuthenticated]  # Requires a valid JWT token for access
+    pagination_class = CustomPagination
+
+    def create(self, request, *args, **kwargs):
+        institution_id = self.request.user.institution
+        branch_id = self.request.user.branch
+        from_date = request.data.get('from_date')
+        from_date = datetime.strptime(from_date, '%Y-%m-%d')
+        to_date = request.data.get('to_date')
+        to_date = datetime.strptime(to_date, '%Y-%m-%d')
+        staff_infos = Staff.objects.filter(status=True,institution=institution_id,branch=branch_id)
+        print(staff_infos,from_date,to_date,institution_id,branch_id)
+        for staff_info in staff_infos:
+            process_count = ProcessStaffAttendanceMst.objects.filter(Q(staff=staff_info),Q(status=True),Q(from_date__range=(from_date, to_date)) | Q(to_date__range=(from_date, to_date))).count()
+            print(staff_info,process_count)
+            if process_count == 0:
+                print('okay')
+
+        return CustomResponse(code=status.HTTP_200_OK, message="Process Done", data=None)

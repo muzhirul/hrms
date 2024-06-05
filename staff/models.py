@@ -552,6 +552,8 @@ class ProcessStaffAttendanceMst(models.Model):
     holiday_day = models.IntegerField(default=0)
     actual_gross = models.IntegerField(default=0)
     calc_gross = models.IntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+    status = models.BooleanField(default=True)
     institution = models.ForeignKey(Institution,on_delete=models.SET_NULL,blank=True,null=True,verbose_name='Institution Name')
     branch = models.ForeignKey(Branch,on_delete=models.SET_NULL,blank=True,null=True,verbose_name='Branch Name')
     created_by = UserForeignKey(auto_user_add=True, on_delete=models.SET_NULL,related_name='staff_proc_atnn_mst_creator', editable=False, blank=True, null=True)

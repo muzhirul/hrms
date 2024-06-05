@@ -590,3 +590,8 @@ class StaffLeaveTransactionCreateSerializer(serializers.ModelSerializer):
 #     class Meta:
 #         model = StaffLeaveTransaction
 #         exclude = ['status']
+
+class ProcessStaffAttendanceMstCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProcessStaffAttendanceMst
+        exclude = ['updated_at','created_at','code','total_day','created_by','updated_by']

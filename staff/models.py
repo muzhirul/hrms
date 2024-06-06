@@ -538,6 +538,7 @@ def staff_atnn_code():
 class ProcessStaffAttendanceMst(models.Model):
     code = models.CharField(max_length=15,verbose_name='Code',default=staff_atnn_code,editable=False)
     staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
+    staff_code = models.CharField(max_length=100, blank=True,null=True)
     from_date = models.DateField()
     to_date = models.DateField()
     total_day = models.IntegerField(default=0,editable=False)
@@ -545,6 +546,7 @@ class ProcessStaffAttendanceMst(models.Model):
     absent_day = models.IntegerField(default=0)
     late_day = models.IntegerField(default=0)
     early_gone_day = models.IntegerField(default=0)
+    tot_payble_day = models.IntegerField(default=0)
     ot_hour = models.IntegerField(default=0)
     gen_type = models.CharField(max_length=15, default='AUTO')
     tour_day = models.IntegerField(default=0)

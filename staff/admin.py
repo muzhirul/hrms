@@ -103,8 +103,8 @@ class AttendanceDailyRawAdmin(admin.ModelAdmin):
         model = AttendanceDailyRaw
 
 class ProcessStaffAttendanceMstAdmin(admin.ModelAdmin):
-    list_display = ['code','staff','from_date','to_date','total_day']
-    search_fields = ['code','from_date','to_date','total_day']
+    list_display = ['code','staff','staff_code','from_date','to_date','total_day']
+    search_fields = ['code','staff_code','from_date','to_date','total_day']
 
     class Meta:
         model = ProcessStaffAttendanceMst

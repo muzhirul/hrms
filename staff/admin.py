@@ -44,7 +44,7 @@ class StaffLeaveTransactionAdminTabularInline(admin.TabularInline):
 class StaffAdmin(admin.ModelAdmin):
     list_display = ['staff_id','first_name','last_name']
     fieldsets = [
-        ("Basic Information",{'fields':[('first_name','last_name','gender','religion'),('email','dob','mobile_no','emergency_number','nid'),('photo','photo_thumbnail','blood_group','marital_status'),]}),
+        ("Basic Information",{'fields':[('user','first_name','last_name','gender','religion'),('email','dob','mobile_no','emergency_number','nid'),('photo','photo_thumbnail','blood_group','marital_status'),]}),
         ("Address",{'fields':[('present_address','permanent_address'),]}),
         ("Institution Information",{'fields':[('institution','branch'),]}),
         ("Assignment",{'fields':[('doj','role','department','designation','shift','status'),]})        
@@ -56,8 +56,8 @@ class StaffAdmin(admin.ModelAdmin):
     inlines = [EducationTabularInline,PayrollTabularInline,BankAccountDetailsTabularInline,StaffSocialMediaTabularInline,StaffLeaveTabulrInline,StaffLeaveTransactionAdminTabularInline,ProcessAttendanceDailyAdminTabularInline]
 
 class DepartmentAdmin(admin.ModelAdmin):
-    list_display = ['name','dept_ord']
-    fields = ['name','dept_ord']
+    list_display = ['name','dept_ord','institution','branch']
+    fields = ['name','dept_ord','institution','branch']
 
     class Meta:
         model = Department
@@ -103,7 +103,7 @@ class AttendanceDailyRawAdmin(admin.ModelAdmin):
         model = AttendanceDailyRaw
 
 class ProcessStaffAttendanceMstAdmin(admin.ModelAdmin):
-    list_display = ['code','staff','staff_code','from_date','to_date','total_day']
+    list_display = ['code','staff','staff_code','staff_payroll','from_date','to_date','total_day','actual_gross']
     search_fields = ['code','staff_code','from_date','to_date','total_day']
 
     class Meta:

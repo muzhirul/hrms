@@ -61,7 +61,7 @@ class Department(models.Model):
     code = models.CharField(max_length=20, blank=True, null=True)
     name = models.CharField(max_length=255, blank=True, null=True)
     dept_ord = models.IntegerField(blank=True, null=True, verbose_name='Department Order')
-    Institution = models.ForeignKey(Institution,on_delete=models.SET_NULL,blank=True,null=True,verbose_name='Institution Name')
+    institution = models.ForeignKey(Institution,on_delete=models.SET_NULL,blank=True,null=True,verbose_name='Institution Name')
     branch = models.ForeignKey(Branch,on_delete=models.SET_NULL,blank=True,null=True,verbose_name='Branch Name')
     status = models.BooleanField(default=True)
     created_by = UserForeignKey(auto_user_add=True, on_delete=models.SET_NULL,related_name='department_creator', editable=False, blank=True, null=True)
@@ -271,6 +271,9 @@ class StaffLeave(models.Model):
 
     def __str__(self):
         return str(self.id)
+    
+    def remaining_days(self):
+        return self.leave_days - (self.taken_days+self.process_days)
     
     def clean(self):
         super().clean()
@@ -541,6 +544,7 @@ class ProcessStaffAttendanceMst(models.Model):
     staff_code = models.CharField(max_length=100, blank=True,null=True)
     from_date = models.DateField()
     to_date = models.DateField()
+    staff_payroll = models.ForeignKey(StaffPayroll, on_delete=models.SET_NULL, blank=True, null=True)
     total_day = models.IntegerField(default=0,editable=False)
     present_day = models.IntegerField(default=0)
     absent_day = models.IntegerField(default=0)

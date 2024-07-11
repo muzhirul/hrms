@@ -1930,6 +1930,20 @@ class StaffAttendanceSummeryProcess(generics.CreateAPIView):
         print(staff_infos,from_date,to_date,institution_id,branch_id)
         for staff_info in staff_infos:
             process_count = ProcessStaffAttendanceMst.objects.filter(Q(staff=staff_info),Q(status=True),Q(from_date__range=(from_date, to_date)) | Q(to_date__range=(from_date, to_date))).count()
+            min_duration = timedelta(minutes=10)
+            attn_late_infos = ProcessAttendanceDaily.objects.filter(status=True,is_active=True,
+                                                                      staff=staff_info,attn_date__range=(from_date, to_date),
+                                                                    #   late_by_min__gte=min_duration,
+                                                                     late_by_min__gt = min_duration,
+                                                                      attn_type__name__iexact = 'late'
+                                                                      )
+            # Calculate the sum of late_by_min
+            total_late_by_min = attn_late_infos.aggregate(total_late=Sum('late_by_min'))['total_late']
+            print('11111111111111')
+            print(total_late_by_min)
+            for attn_late_info in attn_late_infos:
+                print('********')
+                print((attn_late_info.late_by_min/60).total_seconds())
             print(staff_info,process_count)
             if process_count == 0:
                 staff_payroll = StaffPayroll.objects.filter(Q(status=True),
@@ -1945,7 +1959,7 @@ class StaffAttendanceSummeryProcess(generics.CreateAPIView):
                     attn_type_queries |= Q(attn_type__name__iexact=attn_type)
 
                 if staff_payroll:
-                    staff_payroll_id = staff_payroll.id
+                    staff_payroll_id = staff_payroll
                     staff_type = staff_payroll.contract_type.name.lower()
                     staff_gross = staff_payroll.gross
                     print(staff_payroll_id,staff_payroll.gross,staff_payroll.contract_type.name.lower(),'okay')
@@ -2000,6 +2014,7 @@ class StaffAttendanceSummeryProcess(generics.CreateAPIView):
                 proc_attn_mst['staff_code'] = staff_info.staff_id
                 proc_attn_mst['from_date'] = from_date
                 proc_attn_mst['to_date'] = to_date
+                proc_attn_mst['staff_payroll'] = staff_payroll_id
                 proc_attn_mst['present_day'] = total_present
                 proc_attn_mst['absent_day'] = total_absent
                 proc_attn_mst['late_day'] = total_late

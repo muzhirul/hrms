@@ -67,7 +67,7 @@ class StaffLeaveViewSerialier(serializers.ModelSerializer):
     leave_type = LeaveTypeView2Serializer()
     class Meta:
         model = StaffLeave
-        fields = ['leave_type','leave_days','taken_days','is_active']
+        fields = ['leave_type','leave_days','process_days','remaining_days','taken_days','is_active']
 
 class StaffLeaveListSerialier(serializers.ModelSerializer):
     id = serializers.SerializerMethodField()

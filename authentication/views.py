@@ -219,11 +219,13 @@ class DashboardView(generics.ListAPIView):
             dashboard_data['present']['name']='Staff Present'
             dashboard_data['present']['count']=total_present
             dashboard_data['present']['total']=total_emp
+            dashboard_data['present']['percentage']=round((total_present*100)/total_emp)
 
             dashboard_data['absent'] = {}
             dashboard_data['absent']['name']='Staff Absent'
             dashboard_data['absent']['count']=total_absent
             dashboard_data['absent']['total']=total_emp
+            dashboard_data['absent']['percentage']=round((total_absent*100)/total_emp)
 
             dept_wise_emp = Department.objects.annotate(total_emp=Count('staff')).order_by('name')
             dashboard_data['dept_wise_emp'] = []  

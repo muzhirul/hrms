@@ -1360,6 +1360,7 @@ class staffLeaveTransactionCreate(generics.CreateAPIView):
                 end_date = serializer.validated_data.get('end_date')
                 if start_date == end_date:
                     day_name = start_date.strftime('%A').lower()
+                    print(day_name)
                     if(day_name=='friday'):
                         return CustomResponse(code=status.HTTP_400_BAD_REQUEST, message="You Can't create leave on Weekend", data=None)
                 if not apply_by:
@@ -1623,7 +1624,12 @@ class StaffLeaveTrnsAlllLst(generics.ListAPIView):
     def get_queryset(self):
         institution_id = self.request.user.institution
         branch_id = self.request.user.branch
-        queryset = StaffLeaveTransaction.objects.filter(status=True,institution=institution_id,branch=branch_id)
+        responsible = self.request.query_params.get('responsible')
+        print(responsible)
+        if responsible:
+            queryset = StaffLeaveTransaction.objects.filter(responsible=responsible,status=True,institution=institution_id,branch=branch_id)
+        else:
+            queryset = StaffLeaveTransaction.objects.filter(status=True,institution=institution_id,branch=branch_id)
         try:
             if institution_id and branch_id:
                 queryset = queryset.filter(institution=institution_id, branch=branch_id,status=True).order_by('-id')
@@ -1909,7 +1915,6 @@ class StaffPunchData(generics.ListAPIView):
                 else:
                     pass
         return Response(punch_data)
-
 
 class StaffAttendanceSummeryProcess(generics.CreateAPIView):
     serializer_class = ProcessStaffAttendanceMstCreateSerializer

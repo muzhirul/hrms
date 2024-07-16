@@ -1727,4 +1727,50 @@ class ActiveStatusList(generics.ListAPIView):
 
         return Response(response_data)
 
+'''For Leave Approval Status'''
+
+class LeaveApprovalStatusList(generics.ListAPIView):
+    serializer_class = LeaveApprovalViewSerializer
+    # Requires a valid JWT token for access
+    permission_classes = [permissions.IsAuthenticated]
+    pagination_class = CustomPagination
+
+    def get_queryset(self):
+        queryset = Setup.objects.filter(status=True,parent__type='APPROVAL_STATUS').order_by('id')
+        # try:
+        #     institution_id = self.request.user.institution
+        #     branch_id = self.request.user.branch
+        #     # users = Authentication.objects.get(id=user_id)
+        #     if institution_id and branch_id:
+        #         queryset = queryset.filter(institution=institution_id, branch=branch_id,status=True).order_by('sl_no')
+        #     elif branch_id:
+        #         queryset = queryset.filter(branch=branch_id,status=True).order_by('sl_no')
+        #     elif institution_id:
+        #         queryset = queryset.filter(institution=institution_id,status=True).order_by('sl_no')
+        #     else:
+        #         queryset
+        # except:
+        #     pass
+        return queryset
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            response_data = self.get_paginated_response(serializer.data).data
+        else:
+            serializer = self.get_serializer(queryset, many=True)
+            response_data = {
+                "code": 200,
+                "message": "Success",
+                "data": serializer.data,
+                "pagination": {
+                    "next": None,
+                    "previous": None,
+                    "count": queryset.count(),
+                },
+            }
+
+        return Response(response_data)
 

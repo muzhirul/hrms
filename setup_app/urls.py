@@ -49,5 +49,7 @@ urlpatterns = [
     path('api/marital-status/list', MaritalStatusList.as_view(), name='marital-status-day'),
     # For Active Status 
     path('api/active-status/list', ActiveStatusList.as_view(), name='active-status-list'),
+    # For leave Approval Status 
+    path('api/leave-approval-status/list', LeaveApprovalStatusList.as_view(), name='leave-approval-status-list'),
 
 ]

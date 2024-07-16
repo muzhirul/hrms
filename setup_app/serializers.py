@@ -212,3 +212,8 @@ class ActiveStatusViewSerializer(serializers.ModelSerializer):
     class Meta:
         model = ActiveStatus
         fields = ['id','name']
+
+class LeaveApprovalViewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Setup
+        fields = ['id','title']

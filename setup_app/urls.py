@@ -47,5 +47,7 @@ urlpatterns = [
     path('api/role/list', RoleList.as_view(), name='role-day'),
     # For MaritalStatus 
     path('api/marital-status/list', MaritalStatusList.as_view(), name='marital-status-day'),
+    # For Active Status 
+    path('api/active-status/list', ActiveStatusList.as_view(), name='active-status-list'),
 
 ]

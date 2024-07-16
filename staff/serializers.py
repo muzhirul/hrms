@@ -522,6 +522,7 @@ class staffSerializer2(serializers.ModelSerializer):
     shift = StaffShiftListSerializer2(read_only=True)
     role = RoleSerializer(read_only=True)
     marital_status = MaritalStatusViewSerializer(read_only=True)
+    category = ContractTypeViewSerializer(read_only=True)
     staff_status = ActiveStatusViewSerializer(read_only=True)
     staff_education = EducationViewSerializer(many=True, required=False, read_only=True)
     payroll =StaffPayrollViewSerializer(many=True, required=False, read_only=True)

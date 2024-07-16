@@ -42,7 +42,7 @@ class StaffLeaveTransactionAdminTabularInline(admin.TabularInline):
     
 @admin_thumbnails.thumbnail('photo')
 class StaffAdmin(admin.ModelAdmin):
-    list_display = ['staff_id','first_name','last_name','staff_status']
+    list_display = ['staff_id','first_name','last_name','category','staff_status']
     fieldsets = [
         ("Basic Information",{'fields':[('user','first_name','last_name','gender','religion'),('email','dob','mobile_no','emergency_number','nid'),('photo','photo_thumbnail','blood_group','marital_status'),]}),
         ("Address",{'fields':[('present_address','permanent_address'),]}),

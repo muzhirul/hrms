@@ -136,6 +136,7 @@ class Staff(models.Model):
     shift = models.ForeignKey(StaffShift, on_delete=models.SET_NULL, blank=True, null=True)
     step = models.IntegerField(default=1)
     user = models.OneToOneField(Authentication,on_delete=models.SET_NULL, blank=True,null=True)
+    category = models.ForeignKey(ContractType, on_delete=models.SET_NULL, blank=True, null=True)
     staff_status = models.ForeignKey(ActiveStatus, on_delete=models.SET_NULL, blank=True, null=True)
     last_attn_proc_date = models.DateField(blank=True,null=True)
     institution = models.ForeignKey(Institution,on_delete=models.SET_NULL,blank=True,null=True,verbose_name='Institution Name')
@@ -208,7 +209,13 @@ class StaffPayroll(models.Model):
 
     def __str__(self):
         return str(self.id)
-    
+
+@receiver(post_save, sender=StaffPayroll)
+def update_staff_status(sender, instance, **kwargs):
+    if instance.staff:
+        instance.staff.category = instance.contract_type
+        instance.staff.save()
+
 class StaffBankAccountDetails(models.Model):
     staff = models.ForeignKey(Staff, on_delete=models.SET_NULL, blank=True,null=True,related_name='bank_info')
     account_title = models.CharField(max_length=255,verbose_name='Account Title')

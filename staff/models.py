@@ -136,6 +136,7 @@ class Staff(models.Model):
     shift = models.ForeignKey(StaffShift, on_delete=models.SET_NULL, blank=True, null=True)
     step = models.IntegerField(default=1)
     user = models.OneToOneField(Authentication,on_delete=models.SET_NULL, blank=True,null=True)
+    staff_status = models.ForeignKey(ActiveStatus, on_delete=models.SET_NULL, blank=True, null=True)
     last_attn_proc_date = models.DateField(blank=True,null=True)
     institution = models.ForeignKey(Institution,on_delete=models.SET_NULL,blank=True,null=True,verbose_name='Institution Name')
     branch = models.ForeignKey(Branch,on_delete=models.SET_NULL,blank=True,null=True)
@@ -584,7 +585,44 @@ class ProcessStaffAttendanceMst(models.Model):
     def __str__(self):
         return str(self.code)
 
+def staff_status_code():
+    last_staff_status_code = StaffStatusTransaction.objects.all().order_by('code').last()
+    if not last_staff_status_code or last_staff_status_code.code is None:
+        return 'M-' + '1'
+    staff_status_num = str(last_staff_status_code.code)[2:]
+    staff_status_num_int = int(staff_status_num)
+    new_staff_status_num = staff_status_num_int + 1
+    new_gd_num = 'M-' + str(new_staff_status_num)
+    return new_gd_num  
 
+class StaffStatusTransaction(models.Model):
+    code = models.CharField(max_length=15,default=staff_status_code,editable=False)
+    start_date = models.DateTimeField(blank=True,null=True)
+    end_date = models.DateTimeField(blank=True,null=True)
+    staff = models.ForeignKey(Staff, on_delete=models.SET_NULL,blank=True,null=True)
+    staff_status = models.ForeignKey(ActiveStatus, on_delete=models.SET_NULL, blank=True, null=True)
+    reason = models.TextField()
+    remarks = models.TextField(blank=True,null=True)
+    is_active = models.BooleanField(default=True)
+    status = models.BooleanField(default=True)
+    institution = models.ForeignKey(Institution,on_delete=models.SET_NULL,blank=True,null=True,verbose_name='Institution Name')
+    branch = models.ForeignKey(Branch,on_delete=models.SET_NULL,blank=True,null=True,verbose_name='Branch Name')
+    created_by = UserForeignKey(auto_user_add=True, on_delete=models.SET_NULL,related_name='staff_status_creator', editable=False, blank=True, null=True)
+    updated_by = UserForeignKey(auto_user=True, on_delete=models.SET_NULL, related_name='staff_status_update_by', editable=False, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'staff_status_trns'
+
+    def __str__(self):
+        return str(self.code)
+    
+@receiver(post_save, sender=StaffStatusTransaction)
+def update_staff_status(sender, instance, **kwargs):
+    if instance.staff:
+        instance.staff.staff_status = instance.staff_status
+        instance.staff.save()
 
 
 

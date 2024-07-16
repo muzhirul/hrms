@@ -42,7 +42,7 @@ class StaffLeaveTransactionAdminTabularInline(admin.TabularInline):
     
 @admin_thumbnails.thumbnail('photo')
 class StaffAdmin(admin.ModelAdmin):
-    list_display = ['staff_id','first_name','last_name']
+    list_display = ['staff_id','first_name','last_name','staff_status']
     fieldsets = [
         ("Basic Information",{'fields':[('user','first_name','last_name','gender','religion'),('email','dob','mobile_no','emergency_number','nid'),('photo','photo_thumbnail','blood_group','marital_status'),]}),
         ("Address",{'fields':[('present_address','permanent_address'),]}),
@@ -110,6 +110,14 @@ class ProcessStaffAttendanceMstAdmin(admin.ModelAdmin):
         model = ProcessStaffAttendanceMst
 
 
+class StaffStatusTransactionAdmin(admin.ModelAdmin):
+    list_display = ['code','staff','start_date','end_date','reason','status']
+    # search_fields = ['code','staff_code','from_date','to_date','total_day']
+
+    class Meta:
+        model = StaffStatusTransaction
+
+
 
 admin.site.register(Staff,StaffAdmin)
 admin.site.register(Designation,DesignationAdmin)
@@ -120,3 +128,4 @@ admin.site.register(ProcessAttendanceDaily,ProcessAttendanceDailyAdmin)
 admin.site.register(StaffLeaveTransaction,StaffLeaveTransactionAdmin)
 admin.site.register(StaffLeaveAppHistory)
 admin.site.register(ProcessStaffAttendanceMst,ProcessStaffAttendanceMstAdmin)
+admin.site.register(StaffStatusTransaction,StaffStatusTransactionAdmin)

@@ -10,8 +10,8 @@ def product_registration():
     headers = {}
     response = requests.request("GET", url, headers=headers, data=payload)
     print('Insert Attendance data process DONE')
-    # url = f"{config('BASE_URL')}/staff/api/attendance/update/process"
-    # payload={}
-    # headers = {}
-    # response = requests.request("GET", url, headers=headers, data=payload)
-    # print('Attendance data update process DONE')
+    url = f"{config('BASE_URL')}/staff/api/attendance/update/process"
+    payload={}
+    headers = {}
+    response = requests.request("GET", url, headers=headers, data=payload)
+    print('Attendance data update process DONE')

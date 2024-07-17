@@ -535,6 +535,13 @@ class StaffLeaveAppHistory(models.Model):
 
     def __str__(self):
         return str(self.id)
+    
+@receiver(post_save, sender=StaffLeaveAppHistory)
+def update_leave_approval_status(sender, instance, **kwargs):
+    if instance.leave_trns:
+        instance.leave_trns.app_status = instance.app_status
+        instance.leave_trns.save()
+
 
 def staff_atnn_code():
     last_staff_attn_code = ProcessStaffAttendanceMst.objects.all().order_by('code').last()

@@ -10,12 +10,11 @@ from setup_app.models import *
 from hrms.permission import check_permission
 from authentication.models import Authentication
 from datetime import datetime
-from django.db.models import Min, Max
+from django.db.models import Q,F,Min, Max
 from django.db.models.functions import Coalesce
-from django.db.models import F
 from django.shortcuts import get_object_or_404
-from django.db.models import Q
 import requests
+from django.utils import timezone
 # Create your views here.
 
 class StaffDepartmentList(generics.ListAPIView):
@@ -1268,21 +1267,27 @@ class staffSpecificRawAttendance(generics.CreateAPIView):
         return Response(response_data)
 
 class StaffAttendanceUpdateProcess(generics.ListCreateAPIView):
-
+    
     def list(self,request,*args, **kwargs):
+        
         attn_date = datetime.now().date()
         try:
             attn_raw_datas = AttendanceDailyRaw.objects.filter(attn_date=attn_date,staff__isnull=False,is_active=True, status=True).values('staff', 'attn_date').annotate(
                                         in_time=Coalesce(Min('trnsc_time'), F('attn_date')),
                                         out_time=Coalesce(Max('trnsc_time'), F('attn_date'))
                                     )
+            # print(attn_raw_datas,'===============')
             for attn_raw_data in attn_raw_datas:
-                in_datetime = attn_raw_data['in_time']
-                out_datetime = attn_raw_data['out_time']
+                # from pytz import timezone as pytz_timezone
+                # db_timezone = pytz_timezone('Asia/Dhaka')
+                in_datetime = timezone.localtime(attn_raw_data['in_time'], timezone.get_current_timezone())
+                out_datetime = timezone.localtime(attn_raw_data['out_time'], timezone.get_current_timezone())
                 daily_attn = ProcessAttendanceDaily.objects.get(attn_date=attn_raw_data['attn_date'],staff=attn_raw_data['staff'],is_active=True,status=True)
                 if daily_attn:
                     shift_start_time = daily_attn.shift.start_time
+                    
                     in_time = in_datetime.time()
+                    print(shift_start_time,'============',in_datetime,in_time)
                     if in_time <= shift_start_time:
                         att_type = AttendanceType.objects.get(name__iexact='present',status=True)
                         attn_id = att_type
@@ -1310,8 +1315,8 @@ class StaffAttendanceUpdateProcess(generics.ListCreateAPIView):
                                         out_time=Coalesce(Max('trnsc_time'), F('attn_date'))
                                     )
             for attn_raw_data in attn_raw_datas:
-                in_datetime = attn_raw_data['in_time']
-                out_datetime = attn_raw_data['out_time']
+                in_datetime = timezone.localtime(attn_raw_data['in_time'], timezone.get_current_timezone())
+                out_datetime = timezone.localtime(attn_raw_data['out_time'], timezone.get_current_timezone())
                 daily_attn = ProcessAttendanceDaily.objects.get(attn_date=attn_raw_data['attn_date'],staff=attn_raw_data['staff'],is_active=True,status=True)
                 if daily_attn:
                     shift_start_time = daily_attn.shift.start_time

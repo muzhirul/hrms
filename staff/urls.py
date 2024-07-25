@@ -52,4 +52,6 @@ urlpatterns = [
     path('api/attendance-summery/process', StaffAttendanceSummeryProcess.as_view(), name='staff-attn-summery-process'),
     # Staff Status Transaction
     path('api/status/trns/create',StaffStaffCreate.as_view(), name='staff-status-trns-create-list'),
+    # Staff Leave Histor
+    path('api/leave-approval/<int:pk>',StaffLeaveHistoryUpdate.as_view(), name='staff-leave-history-update'),
 ]

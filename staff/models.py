@@ -538,7 +538,23 @@ class StaffLeaveAppHistory(models.Model):
     
 @receiver(post_save, sender=StaffLeaveAppHistory)
 def update_leave_approval_status(sender, instance, **kwargs):
-    if instance.leave_trns:
+    if instance.app_status:
+        from datetime import datetime
+        print(instance.leave_trns.day_count,instance.leave_trns.leave_type,instance.leave_trns.apply_by)
+        leave_bal = StaffLeave.objects.filter(staff=instance.leave_trns.apply_by,leave_type=instance.leave_trns.leave_type,status=True,is_active=True,institution=instance.institution,branch=instance.branch).last()
+        print('******',leave_bal.leave_days,leave_bal.process_days)
+        try:
+            if instance.app_status.type == 'APPROVED':
+                StaffLeave.objects.filter(pk=leave_bal.pk).update(
+                    process_days=leave_bal.process_days - instance.leave_trns.day_count,
+                    taken_days=leave_bal.taken_days + instance.leave_trns.day_count
+                )
+            else:
+                StaffLeave.objects.filter(pk=leave_bal.pk).update(
+                    process_days=leave_bal.process_days - instance.leave_trns.day_count
+                )
+        except Exception as e:
+            print(f"Error updating StaffLeave: {e}")
         instance.leave_trns.app_status = instance.app_status
         instance.leave_trns.save()
 

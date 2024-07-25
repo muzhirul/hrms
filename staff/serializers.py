@@ -167,6 +167,12 @@ class StaffLeaveAppHistoryViewSerializer(serializers.ModelSerializer):
         model = StaffLeaveAppHistory
         exclude = ['status','is_active','leave_trns','created_at','updated_at','created_by','updated_by','institution','branch']
 
+class StaffLeaveAppHistoryCreateSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = StaffLeaveAppHistory
+        fields = ['app_status','remarks','approve_date']
+
 class StaffLeaveTransactionListSerializer(serializers.ModelSerializer):
     leave_type = LeaveTypeView2Serializer(read_only=True)
     apply_by = StaffTeacherViewSerializer(read_only=True)
@@ -177,7 +183,6 @@ class StaffLeaveTransactionListSerializer(serializers.ModelSerializer):
     class Meta:
         model = StaffLeaveTransaction
         exclude = ['status']
-
 
 class StaffLeaveTransactionViewSerializer(serializers.ModelSerializer):
     leave_type = LeaveTypeView2Serializer(read_only=True)

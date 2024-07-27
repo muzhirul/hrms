@@ -1736,7 +1736,12 @@ class LeaveApprovalStatusList(generics.ListAPIView):
     pagination_class = CustomPagination
 
     def get_queryset(self):
+        status_id = self.request.query_params.get('status_id')
         queryset = Setup.objects.filter(status=True,parent__type='APPROVAL_STATUS').order_by('id')
+        if status_id is not None:
+            status_id = int(status_id)
+            # Exclude objects where id equals status_id
+            queryset = queryset.exclude(id=status_id)
         # try:
         #     institution_id = self.request.user.institution
         #     branch_id = self.request.user.branch

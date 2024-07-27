@@ -1386,7 +1386,7 @@ class staffLeaveTransactionCreate(generics.CreateAPIView):
                 
                 duration = 1 + (end_date - start_date).days
                 total_proces_day = proces_day + duration
-                leave_trns_count = StaffLeaveTransaction.objects.filter(Q(is_active=True) ,Q(status=True),Q(apply_by=apply_by),Q(institution=institution), Q(branch=branch),Q(start_date__range=(start_date, end_date)) | Q(end_date__range=(start_date, end_date))).count()
+                leave_trns_count = StaffLeaveTransaction.objects.filter(Q(is_active=True) ,Q(status=True),Q(apply_by=apply_by),Q(institution=institution), Q(branch=branch),~Q(app_status__type='DENY'),Q(start_date__range=(start_date, end_date)) | Q(end_date__range=(start_date, end_date))).count()
                 if leave_trns_count > 0:
                     return CustomResponse(code=status.HTTP_400_BAD_REQUEST, message="Leave Already Applied", data=None)
                 if duration > leave_remain_days:
@@ -2146,11 +2146,10 @@ class StaffLeaveHistoryUpdate(generics.RetrieveUpdateAPIView):
         
         try:
             if serializer.is_valid():
-                print(instance.leave_trns.app_status,'==============')
                 if instance.leave_trns.app_status.type == 'APPROVED':
-                    return CustomResponse(code=status.HTTP_200_OK, message="Staff Leave Already Approved", data=None)
+                    return CustomResponse(code=status.HTTP_400_BAD_REQUEST, message="Sorry, Staff Leave Already Approved!!!", data=None)
                 if instance.leave_trns.app_status.type == 'DENY':
-                    return CustomResponse(code=status.HTTP_200_OK, message="Staff Leave Already Deny", data=None)
+                    return CustomResponse(code=status.HTTP_403_FORBIDDEN, message="Sorry, Staff Leave Already Deny!!!", data=None)
                 # Perform any custom update logic here if needed
                 instance = serializer.save()
                 # Customize the response format for successful update

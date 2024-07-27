@@ -549,10 +549,12 @@ def update_leave_approval_status(sender, instance, **kwargs):
                     process_days=leave_bal.process_days - instance.leave_trns.day_count,
                     taken_days=leave_bal.taken_days + instance.leave_trns.day_count
                 )
-            else:
+            elif instance.app_status.type == 'DENY':
                 StaffLeave.objects.filter(pk=leave_bal.pk).update(
                     process_days=leave_bal.process_days - instance.leave_trns.day_count
                 )
+            else:
+                pass
         except Exception as e:
             print(f"Error updating StaffLeave: {e}")
         instance.leave_trns.app_status = instance.app_status

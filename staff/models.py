@@ -328,8 +328,6 @@ class ProcessAttendanceDaily(models.Model):
     def get_day_name(self):
         return self.attn_date.strftime('%A')
     
-
-
 @receiver(pre_save, sender=ProcessAttendanceDaily)        
 def calculate_duration(sender, instance, **kwargs):
     if instance.in_time and instance.out_time:
@@ -499,6 +497,16 @@ def calculate_duration(sender, instance, **kwargs):
         instance.day_count = duration
     else:
         instance.day_count = None
+
+@receiver(post_save, sender=StaffLeaveTransaction)
+def status_update_in_attn(sender, instance, **kwargs):
+    if instance.app_status.type == 'APPROVED':
+        attn_type_id = AttendanceType.objects.filter(status=True,name__iexact=instance.leave_type.leave_type_code).last()
+        if attn_type_id:
+            ProcessAttendanceDaily.objects.filter(status=True,is_active=True,staff=instance.apply_by,attn_date__range=(instance.start_date, instance.end_date)).update(attn_type=attn_type_id)
+        else:
+            print('Something worng in attendance type data')
+
 
 # @receiver(post_save, sender=StaffLeaveTransaction)
 # def update_taken_day(sender,instance,**kwargs):

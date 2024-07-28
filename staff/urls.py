@@ -21,6 +21,7 @@ urlpatterns = [
     path('api/image/<int:pk>', StaffImageUpload.as_view(), name='staff-image-upload'),
     path('api/role-base-staff/<str:role_id>', staffRoleBaseSataffListView.as_view(), name='role-base-staff-List'),
     path('api/search/staff/list', StaffSearchList.as_view(), name='search-staff-list'),
+    path('api/gear-up-down/create',StaffUpDownCreateView.as_view(), name='staff-up-down-create-list'),
 
     # staff shift API
     path('api/shift/list', StaffShiftList.as_view(),name='shift-list'),

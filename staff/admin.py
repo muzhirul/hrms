@@ -10,7 +10,7 @@ class EducationTabularInline(admin.TabularInline):
 
 class PayrollTabularInline(admin.TabularInline):
     model = StaffPayroll
-    fields = ['gross','start_date','end_date','contract_type','is_active','remarks','status']
+    fields = ['gross','start_date','end_date','contract_type','is_active','remarks','institution','branch','status']
     extra = 1
 
 class BankAccountDetailsTabularInline(admin.TabularInline):
@@ -85,7 +85,6 @@ class StaffLeaveAppHistoryTabularInline(admin.TabularInline):
     fields = ['approve_group','approve_by','app_status','approve_date','remarks','is_active','institution','branch','status']
     extra = 0
 
-
 class StaffLeaveTransactionAdmin(admin.ModelAdmin):
     list_display = ['code','leave_type','start_date','end_date','day_count']
     
@@ -93,7 +92,6 @@ class StaffLeaveTransactionAdmin(admin.ModelAdmin):
         model = StaffLeaveTransaction
     
     inlines = [StaffLeaveAppHistoryTabularInline]
-
 
 class AttendanceDailyRawAdmin(admin.ModelAdmin):
     list_display = ['staff','staff_code','src_type','attn_date','trnsc_time','device_name','device_serial']
@@ -108,7 +106,6 @@ class ProcessStaffAttendanceMstAdmin(admin.ModelAdmin):
 
     class Meta:
         model = ProcessStaffAttendanceMst
-
 
 class StaffStatusTransactionAdmin(admin.ModelAdmin):
     list_display = ['code','staff','start_date','end_date','reason','status']

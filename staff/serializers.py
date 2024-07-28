@@ -62,7 +62,6 @@ class ProcessAttendanceViewDailySerializer(serializers.ModelSerializer):
         # exclude = ['role','process_date','staff','staff_code','con_type','institution','branch','status','created_at','updated_at','created_by','updated_by']
         fields = ['attn_date','shift','get_day_name','attn_type','in_time','out_time','duration']
 
-
 class StaffLeaveViewSerialier(serializers.ModelSerializer):
     leave_type = LeaveTypeView2Serializer()
     class Meta:
@@ -86,7 +85,6 @@ class StaffLeaveListSerialier(serializers.ModelSerializer):
 
     def get_name(self, obj):
         return obj.leave_type.name
-   
      
 class EducationSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(required=False)        
@@ -111,7 +109,24 @@ class StaffPayrollCreateSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(required=False)
     class Meta:
         model = StaffPayroll
+        exclude = ['status','created_at','updated_at','created_by','updated_by']
+
+class StaffUpDownCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = StaffPayroll
+        exclude = ['status','created_at','updated_at','created_by','updated_by']
+
+class StaffUpDownViewSerializer(serializers.ModelSerializer):
+    contract_type = ContractTypeViewSerializer(read_only=True)
+    class Meta:
+        model = StaffPayroll
         exclude = ['status','created_at','updated_at','created_by','updated_by','institution','branch']
+
+    def to_representation(self, instance):
+        if instance.status:
+            return super().to_representation(instance)
+        else:
+            return None
 
 class StaffBankViewSerializer(serializers.ModelSerializer):
     bank_name = AccountBankViewSerializer(read_only=True)
@@ -614,3 +629,4 @@ class StaffStatusTransactionViewSerializer(serializers.ModelSerializer):
     class Meta:
         model = StaffStatusTransaction
         fields = ['id','code','staff','staff_status','start_date','end_date','reason','remarks']
+

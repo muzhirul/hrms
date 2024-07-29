@@ -1084,6 +1084,19 @@ class StaffAttendanceProcess(generics.ListCreateAPIView):
         for staff_list in staff_lists:
             data_count = ProcessAttendanceDaily.objects.filter(attn_date=attn_date,staff=staff_list,status=True).count()
             if data_count == 0:
+                leave_balance = StaffLeaveTransaction.objects.filter(
+                        Q(status=True),
+                        Q(is_active=True),
+                        Q(apply_by=staff_list),
+                        Q(institution=staff_list.institution),
+                        Q(branch=staff_list.branch),
+                        Q(app_status__type = 'APPROVED'),
+                        Q(start_date__lte=attn_date),
+                        Q(end_date__gte=attn_date)).last()
+                if leave_balance:
+                    att_type = AttendanceType.objects.get(name__iexact=leave_balance.leave_type.leave_type_code.lower(),status=True)
+                    if att_type:
+                        attn_id = att_type
                 proc_attn_daily['attn_date'] = attn_date
                 proc_attn_daily['staff'] = staff_list
                 proc_attn_daily['shift'] = staff_list.shift
@@ -1126,9 +1139,23 @@ class StaffAttendanceProcess(generics.ListCreateAPIView):
         if proc_date:
             staff_lists = Staff.objects.filter(status=True).order_by('id')
             for staff_list in staff_lists:
+                
                 data_count = ProcessAttendanceDaily.objects.filter(attn_date=proc_date,staff=staff_list,status=True).count()
                 proc_attn_daily = {}
                 if data_count == 0:
+                    leave_balance = StaffLeaveTransaction.objects.filter(
+                        Q(status=True),
+                        Q(is_active=True),
+                        Q(apply_by=staff_list),
+                        Q(institution=staff_list.institution),
+                        Q(branch=staff_list.branch),
+                        Q(app_status__type = 'APPROVED'),
+                        Q(start_date__lte=proc_date),
+                        Q(end_date__gte=proc_date)).last()
+                    if leave_balance:
+                        att_type = AttendanceType.objects.get(name__iexact=leave_balance.leave_type.leave_type_code.lower(),status=True)
+                        if att_type:
+                            attn_id = att_type
                     proc_attn_daily['attn_date'] = proc_date
                     proc_attn_daily['staff'] = staff_list
                     proc_attn_daily['shift'] = staff_list.shift
@@ -1282,7 +1309,7 @@ class StaffAttendanceUpdateProcess(generics.ListCreateAPIView):
                 # db_timezone = pytz_timezone('Asia/Dhaka')
                 in_datetime = timezone.localtime(attn_raw_data['in_time'], timezone.get_current_timezone())
                 out_datetime = timezone.localtime(attn_raw_data['out_time'], timezone.get_current_timezone())
-                daily_attn = ProcessAttendanceDaily.objects.get(attn_date=attn_raw_data['attn_date'],staff=attn_raw_data['staff'],is_active=True,status=True)
+                daily_attn = ProcessAttendanceDaily.objects.get(attn_date=attn_raw_data['attn_date'],staff=attn_raw_data['staff'],is_active=True,status=True,attn_type__iexact='absent')
                 if daily_attn:
                     shift_start_time = daily_attn.shift.start_time
                     

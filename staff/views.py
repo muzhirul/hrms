@@ -1484,6 +1484,8 @@ class staffLeaveTransactionUpdate(generics.RetrieveUpdateAPIView):
                 leave_type = serializer.validated_data.get('leave_type')
                 apply_by = serializer.validated_data.get('apply_by')
                 responsible = serializer.validated_data.get('responsible')
+                if (instance.app_status.type != 'SUBMITTED'):
+                    return CustomResponse(code=status.HTTP_400_BAD_REQUEST, message=f"Leave already {instance.app_status.title}. You can not updated.", data=None)
                 if start_date == end_date:
                     day_name = start_date.strftime('%A').lower()
                     if(day_name=='friday'):

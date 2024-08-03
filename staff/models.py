@@ -507,6 +507,13 @@ def status_update_in_attn(sender, instance, **kwargs):
         else:
             print('Something worng in attendance type data')
 
+@receiver(post_save, sender=StaffLeaveTransaction)
+def delete_leave(sender, instance, **kwargs):
+    if instance.status==False:
+        instance.day_count
+        leave_bal = StaffLeave.objects.filter(staff=instance.apply_by,leave_type=instance.leave_type,status=True,is_active=True,institution=instance.institution,branch=instance.branch).last()
+        StaffLeave.objects.filter(pk=leave_bal.pk).update(process_days=leave_bal.process_days - instance.day_count)
+
 
 # @receiver(post_save, sender=StaffLeaveTransaction)
 # def update_taken_day(sender,instance,**kwargs):
@@ -567,6 +574,8 @@ def update_leave_approval_status(sender, instance, **kwargs):
             print(f"Error updating StaffLeave: {e}")
         instance.leave_trns.app_status = instance.app_status
         instance.leave_trns.save()
+
+
 
 
 def staff_atnn_code():

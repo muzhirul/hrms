@@ -86,7 +86,7 @@ class StaffLeaveAppHistoryTabularInline(admin.TabularInline):
     extra = 0
 
 class StaffLeaveTransactionAdmin(admin.ModelAdmin):
-    list_display = ['code','leave_type','start_date','end_date','day_count']
+    list_display = ['code','leave_type','start_date','end_date','day_count','status']
     
     class Meta:
         model = StaffLeaveTransaction

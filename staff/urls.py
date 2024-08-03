@@ -39,7 +39,8 @@ urlpatterns = [
     # Staff Leaave Transaction
     path('api/leave/balance/list', StaffLeaveList.as_view(), name='staff-leave-list'),
     path('api/leave-trns/create', staffLeaveTransactionCreate.as_view(), name='staff-leave-transaction-create'), 
-    path('api/leave-trns/detail/<int:pk>', staffLeaveTransactionUpdate.as_view(), name='staff-leave-transaction-update'), 
+    path('api/leave-trns/detail/<int:pk>', staffLeaveTransactionUpdate.as_view(), name='staff-leave-transaction-update'),
+    path('api/leave-trns/delete/<int:pk>', staffLeaveTransactionDelete.as_view(), name='staff-leave-transaction-delete'),  
     path('api/leave-trns/view/<int:pk>', staffLeaveTransactionList.as_view(), name='staff-leave-transaction-List'), 
     path('api/leave/status/<str:staff_id>', staffLeaveStatusList.as_view(), name='staff-leave-status-list'),
     path('api/leave-trns/all', StaffLeaveTrnsAlllLst.as_view(), name='staff-leave-transaction-all-list'),
@@ -53,6 +54,6 @@ urlpatterns = [
     path('api/attendance-summery/process', StaffAttendanceSummeryProcess.as_view(), name='staff-attn-summery-process'),
     # Staff Status Transaction
     path('api/status/trns/create',StaffStaffCreate.as_view(), name='staff-status-trns-create-list'),
-    # Staff Leave Histor
+    # Staff Leave History
     path('api/leave-approval/<int:pk>',StaffLeaveHistoryUpdate.as_view(), name='staff-leave-history-update'),
 ]

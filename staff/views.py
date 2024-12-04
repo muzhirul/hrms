@@ -15,6 +15,7 @@ from django.db.models.functions import Coalesce
 from django.shortcuts import get_object_or_404
 import requests
 from django.utils import timezone
+from datetime import timedelta
 # Create your views here.
 
 class StaffDepartmentList(generics.ListAPIView):
@@ -673,6 +674,7 @@ class staffCreateView(generics.CreateAPIView):
                 try:
                     std_user_data = Staff.objects.values('staff_id').get(id=staff.id)
                     std_username = std_user_data['staff_id']
+                    # std_username = std_user_data['staff_no']
                     user_count = Authentication.objects.filter(username=std_username).count()
                     if (user_count==0):
                         user = Authentication(model_name=model_name,username=std_username,first_name=first_name,last_name=last_name,user_type=user_type,is_active=is_active,institution=institution,branch=branch)
@@ -682,19 +684,19 @@ class staffCreateView(generics.CreateAPIView):
                         # Update the student's user_id field
                         staff.user_id = user.id
                         staff.save()
-                    else:
-                        last_username = Authentication.objects.filter(username__startswith='99').order_by('username').last()
-                        # int_last_username = int(last_username)
-                        int_last_username = int(last_username.username)
-                        new_username = (int_last_username+1)
-                        user = Authentication(model_name=model_name,username=new_username,first_name=first_name,last_name=last_name,user_type=user_type,is_active=is_active,institution=institution,branch=branch)
-                        # Set a default password (you can change this as needed)
-                        user.set_password(default_password)
-                        user.save()
-                        # Update the student's user_id field
-                        staff.user_id = user.id
-                        staff.staff_id = new_username
-                        staff.save()
+                    # else:
+                    #     last_username = Authentication.objects.filter(username__startswith='99').order_by('username').last()
+                    #     # int_last_username = int(last_username)
+                    #     int_last_username = int(last_username.username)
+                    #     new_username = (int_last_username+1)
+                    #     user = Authentication(model_name=model_name,username=new_username,first_name=first_name,last_name=last_name,user_type=user_type,is_active=is_active,institution=institution,branch=branch)
+                    #     # Set a default password (you can change this as needed)
+                    #     user.set_password(default_password)
+                    #     user.save()
+                    #     # Update the student's user_id field
+                    #     staff.user_id = user.id
+                    #     staff.staff_id = new_username
+                    #     staff.save()
                 except:
                     pass
                 # staff_educations = []

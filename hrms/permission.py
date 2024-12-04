@@ -20,3 +20,26 @@ def check_permission(user, menu_name, permission_type='view'):
     if menu_permissions:
         return True
     return False
+
+def generate_code(institution, branch, c_type):
+    from datetime import datetime
+    counter = SystemCounter.objects.get(institution=institution, branch=branch, code=c_type)
+    prefix = counter.prefix or ""
+    next_number = counter.next_number
+    separator = counter.separator or ""
+    if counter.counter_width:
+        total_code_width = counter.counter_width
+        fixed_width = len(prefix) + len(counter.separator or "")
+        number_width = total_code_width - fixed_width
+        number_str = str(next_number).zfill(number_width)
+    else:
+        number_str = str(next_number)
+    
+    final_code = f"{prefix}{separator}{number_str}"
+
+    new_next_number = counter.next_number + counter.step
+
+    counter.next_number = new_next_number
+    counter.save()
+
+    return final_code

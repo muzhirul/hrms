@@ -9,6 +9,7 @@ from datetime import datetime, date, time, timedelta
 from hrms_setup.models import AccountBank, LeaveType
 import datetime
 from authentication.models import Authentication
+from hrms.permission import generate_code
 
 from django.db.models import Sum
 from django.db.models.functions import Coalesce
@@ -114,7 +115,8 @@ def cal_duration(sender, instance, **kwargs):
 
 class Staff(models.Model):
     code = models.CharField(max_length=20, blank=True, null=True,verbose_name='Staff Code')
-    staff_id = models.CharField(max_length=20, blank=True,null=True,editable=False, verbose_name='Staff ID',default=staff_no)
+    # staff_id = models.CharField(max_length=20, blank=True,null=True,editable=False, verbose_name='Staff ID',default=staff_no)
+    staff_id = models.CharField(max_length=50, blank=True, null=True)
     first_name = models.CharField(max_length=255, blank=True, null=True, verbose_name='First Name')
     last_name = models.CharField(max_length=255, blank=True, null=True, verbose_name='Last Name')
     gender = models.ForeignKey(Gender,on_delete=models.SET_NULL,blank=True,null=True,related_name='staff_gender')
@@ -155,6 +157,13 @@ class Staff(models.Model):
     
     def name(self):
         return f'{self.first_name} {self.last_name}'
+    
+@receiver(post_save, sender=Staff)
+def staff_id_generator(sender, instance, **kwargs):
+    if not instance.staff_no:
+        new_staff_no = generate_code(instance.institution,instance.branch,'EMP_CODE')
+        instance.staff_no = new_staff_no
+        instance.save()
     
 class Education(models.Model):
     staff = models.ForeignKey(Staff, on_delete=models.SET_NULL, blank=True,null=True,related_name='staff_education')
